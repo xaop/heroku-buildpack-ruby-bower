@@ -101,6 +101,7 @@ class LanguagePack::Ruby < LanguagePack::Base
         install_bower
         build_bower
         run_assets_precompile_rake_task
+        run_templates_precompile_rake_task
       end
       super
     end
@@ -759,6 +760,20 @@ params = CGI.parse(uri.query || "")
         time = Benchmark.realtime { pipe("env PATH=$PATH:bin bundle exec rake assets:precompile 2>&1") }
         if $?.success?
           puts "Asset precompilation completed (#{"%.2f" % time}s)"
+        end
+      end
+    end
+  end
+
+  def run_templates_precompile_rake_task
+    instrument 'ruby.run_templates_precompile_rake_task' do
+      if rake_task_defined?("assets:precompile_templates")
+        require 'benchmark'
+
+        topic "Running: rake assets:precompile_templates"
+        time = Benchmark.realtime { pipe("env PATH=$PATH:bin bundle exec rake assets:precompile_templates 2>&1") }
+        if $?.success?
+          puts "Templates precompilation completed (#{"%.2f" % time}s)"
         end
       end
     end
